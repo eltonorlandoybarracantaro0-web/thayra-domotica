@@ -4819,5 +4819,72 @@ if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch
 })();
 </script>
 
+<!-- THAYRA_AUTONOMOUS_VISION -->
+<script>
+(function(){
+  window.THAYRA_VISION_REMOTE_URL = "";
+
+  function abrirVisionAutonomaMovil(){
+    if(document.getElementById("thayra-vision-modal")) return;
+    const modal = document.createElement("div");
+    modal.id = "thayra-vision-modal";
+    modal.style.cssText = "position:fixed;inset:0;background:rgba(5,9,15,0.96);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;color:#fff;font-family:sans-serif;";
+    modal.innerHTML = `
+      <div style="width:100%;max-width:720px;background:#111827;border:1px solid #374151;border-radius:16px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.8);">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#0f172a;border-bottom:1px solid #1e293b;">
+          <div>
+            <strong style="color:#f59e0b;font-size:16px;">Visión IA — Modo Autónomo</strong>
+            <div id="tv-status" style="font-size:12px;color:#94a3b8;">PC apagada / Sin conexión remota: usando cámara local del dispositivo</div>
+          </div>
+          <button id="tv-close" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:bold;cursor:pointer;">Cerrar</button>
+        </div>
+        <div style="position:relative;background:#000;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;">
+          <video id="tv-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;"></video>
+          <div id="tv-badge" style="position:absolute;top:12px;left:12px;background:rgba(16,185,129,0.9);color:#000;font-weight:bold;font-size:12px;padding:4px 10px;border-radius:999px;">VIGILANCIA ACTIVA</div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    let streamRef = null;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
+      .then(stream => {
+        streamRef = stream;
+        document.getElementById("tv-video").srcObject = stream;
+      })
+      .catch(() => {
+        document.getElementById("tv-status").innerText = "Activa el permiso de cámara en tu navegador para vigilancia autónoma.";
+      });
+
+    document.getElementById("tv-close").onclick = () => {
+      if(streamRef) streamRef.getTracks().forEach(t => t.stop());
+      modal.remove();
+    };
+  }
+
+  document.addEventListener("click", function(e){
+    const btn = e.target.closest("a, button");
+    if(!btn) return;
+    const txt = (btn.innerText || "").toLowerCase();
+    if(txt.includes("visión ia") || txt.includes("vision ia")){
+      e.preventDefault();
+      e.stopPropagation();
+
+      const isLocalPC = (location.hostname === "localhost" || location.hostname === "127.0.0.1");
+      const targetUrl = isLocalPC ? "http://127.0.0.1:5055" : window.THAYRA_VISION_REMOTE_URL;
+
+      if(!targetUrl){
+        abrirVisionAutonomaMovil();
+        return;
+      }
+
+      fetch(targetUrl, { mode: "no-cors" })
+        .then(() => { window.open(targetUrl, "_blank"); })
+        .catch(() => { abrirVisionAutonomaMovil(); });
+    }
+  }, true);
+})();
+</script>
+<!-- /THAYRA_AUTONOMOUS_VISION -->
 </body>
 </html>
