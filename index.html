@@ -4819,5 +4819,34 @@ if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch
 })();
 </script>
 
+
+<script>
+(function(){
+  document.addEventListener("click", async function(e){
+    const btn = e.target.closest("a, button");
+    if(!btn) return;
+    const txt = (btn.innerText || "").toLowerCase();
+    if(txt.includes("visión ia") || txt.includes("vision ia")){
+      e.preventDefault();
+      e.stopPropagation();
+      if(location.hostname === "localhost" || location.hostname === "127.0.0.1"){
+        window.open("http://127.0.0.1:5055", "_blank");
+        return;
+      }
+      try {
+        const res = await fetch("vision_config.json?t=" + Date.now());
+        if(res.ok){
+          const cfg = await res.json();
+          if(cfg.vision_url){
+            window.open(cfg.vision_url, "_blank");
+            return;
+          }
+        }
+      } catch(err){}
+      alert("La PC con Visión IA está apagada o fuera de línea. Thayra sigue operando en modo autónomo.");
+    }
+  }, true);
+})();
+</script>
 </body>
 </html>
