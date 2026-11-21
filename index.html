@@ -845,6 +845,15 @@
                     >
                       Multipantalla
                     </button>
+                    <button
+                      type="button"
+                      onclick="openVisionWindow()"
+                      title="Abrir Centro de Videovigilancia IA en otra ventana"
+                      class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30 transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <span>Visión IA</span>
+                      <span>↗</span>
+                    </button>
                   </div>
                 </div>
 
@@ -2374,6 +2383,16 @@
         </svg>`;
     }
 
+    function getVisionBaseUrl() {
+      const host = window.location.hostname;
+      if (!host || host === 'localhost' || host === '127.0.0.1' || host.includes('github.io')) {
+        return localStorage.getItem('thayra_vision_url') || 'http://127.0.0.1:5055';
+      }
+      return `http://${host}:5055`;
+    }
+    function openVisionWindow() {
+      window.open(getVisionBaseUrl(), '_blank', 'noopener,noreferrer');
+    }
     function renderCamerasGrid() {
       const container = document.getElementById('camerasGridContainer');
       if (!container) return;
@@ -2397,6 +2416,7 @@
         >
           <div class="absolute inset-0">
             ${getCameraIllustrationSVG(cam.scene)}
+            ${appState.cameraSystemOn ? `<img src="${getVisionBaseUrl()}/video_feed/${cam.id}" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover" />` : ''}
           </div>
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/45"></div>
 
