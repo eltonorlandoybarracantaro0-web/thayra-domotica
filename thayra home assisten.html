@@ -2386,7 +2386,7 @@
     function getVisionBaseUrl() {
       const host = window.location.hostname;
       if (!host || host === 'localhost' || host === '127.0.0.1' || host.includes('github.io')) {
-        return localStorage.getItem('thayra_vision_url') || 'http://127.0.0.1:5055';
+        return localStorage.getItem('thayra_vision_url') || (location.hostname==='localhost'||location.hostname==='127.0.0.1'?'http://127.0.0.1:5055':'http://172.20.10.6:5055');
       }
       return `http://${host}:5055`;
     }
